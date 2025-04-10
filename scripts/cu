@@ -1,0 +1,292 @@
+#!/bin/bash
+
+#=======================================================================
+#   _____            __ _                           _       _           
+#  / ____|          / _(_)                         | |     | |          
+# | |     ___  _ __ | |_ _  __ _   _   _ _ __   __| | __ _| |_ ___ _ __ 
+# | |    / _ \| '_ \|  _| |/ _` | | | | | '_ \ / _` |/ _` | __/ _ \ '__|
+# | |___| (_) | | | | | | | (_| | | |_| | |_) | (_| | (_| | ||  __/ |   
+#  \_____\___/|_| |_|_| |_|\__, |  \__,_| .__/ \__,_|\__,_|\__\___|_|   
+#                           __/ |       | |                             
+#                          |___/        |_|                             
+# Configuration updater for dotfiles management
+# Maintainer: Facundo Torraca
+#=======================================================================
+
+
+# =======================================================================
+# IMPORTS 
+# =======================================================================
+
+. $HOME/Documents/dotfiles/utils/log.sh
+. $HOME/Documents/dotfiles/utils/const.sh
+
+
+# =======================================================================
+# CONFIG MAPS 
+# =======================================================================
+
+# Set backup directory
+BACKUP_DIR="$HOME/.dotfiles-backups"
+DOTFILES_DIR="$HOME/Documents/dotfiles"
+
+# Set dotfiles directory if not already set
+if [ -z "$DOTFILES_DIR" ]; then
+    log_info "DOTFILES_DIR not set, using default: $DOTFILES_DIR"
+fi
+
+# Define configurations as key=value pairs in a regular array
+CONFIG_MAP=(
+    "nvim=$HOME/.config/nvim:$DOTFILES_DIR/nvim"
+    "zsh=$HOME/.zshrc:$DOTFILES_DIR/config/term/.zshrc"
+    "git=$HOME/.gitconfig:$DOTFILES_DIR/config/git/.gitconfig"
+    "tmux=$HOME/.tmux.conf:$DOTFILES_DIR/config/term/.tmux.conf"
+    "alacritty=$HOME/.config/alacritty:$DOTFILES_DIR/config/term/.alacritty"
+)
+
+# =======================================================================
+# INTERNAL USE ONLY
+# =======================================================================
+
+# Create a timestamped backup of a file or directory
+# Args:
+#   $1: Path to the file or directory to backup
+#   $2: Name of the config (for backup folder naming)
+_backup() {
+    local target=$1
+    local config_name=$2
+    local timestamp=$(date +%Y%m%d%H%M%S)
+    local backup_path="$BACKUP_DIR/$config_name/$timestamp"
+    
+    # Create backup directory if it doesn't exist
+    mkdir -p "$backup_path"
+    
+    # Handle if target is a directory
+    if [ -d "$target" ]; then
+        if [ ! -e "$target" ]; then
+            log_info "Nothing to backup: $target doesn't exist"
+            return 0
+        fi
+        
+        cp -r "$target/." "$backup_path/"
+        log_success "Directory backup created at $backup_path"
+    # Handle if target is a file
+    elif [ -f "$target" ]; then
+        cp "$target" "$backup_path/"
+        log_success "File backup created at $backup_path"
+    else
+        log_info "Nothing to backup: $target doesn't exist"
+        return 0
+    fi
+    
+    return 0
+}
+
+# Get the configuration path for a specific config type
+# Args:
+#   $1: The config type to get the path for (must exist in CONFIG_MAP)
+_get_config_path() {
+    local config_type=$1
+    
+    for entry in "${CONFIG_MAP[@]}"; do
+        key="${entry%%=*}"
+        if [ "$key" = "$config_type" ]; then
+            value="${entry#*=}"
+            echo "$value"
+            return 0
+        fi
+    done
+    
+    return 1
+}
+
+# Process all configurations
+# Args:
+#   $1: The function to apply to each config (backup or update)
+_process_all_configs() {
+    local func=$1
+    
+    for entry in "${CONFIG_MAP[@]}"; do
+        config_type="${entry%%=*}"
+        $func "$config_type"
+    done
+    
+    log_success "All configurations processed successfully!"
+}
+
+
+# =======================================================================
+# COMMANDS
+# =======================================================================
+
+# Display help information showing available commands and options
+cmd_help() {
+    log_info "Usage: $(basename $0) <command> [options]"
+    log_info ""
+    log_info "Commands:"
+    log_info "  list                List available config types"
+    log_info "  update [--all]      Update configuration(s)"
+    log_info "  backup [--all]      Backup configuration(s)"
+    log_info "  help                Show this help message"
+    log_info ""
+    log_info "Options:"
+    log_info "  --all               Process all configurations"
+    log_info "  <type>              Specify a configuration type"
+    log_info ""
+    log_info "Config types:"
+    
+    # Parse and print each config type
+    for entry in "${CONFIG_MAP[@]}"; do
+        key="${entry%%=*}"
+        log_info "  - $key"
+    done
+    
+    log_info ""
+    log_info "Backups are stored in: $BACKUP_DIR"
+}
+
+# List available config types
+cmd_list() {
+    log_info "Available config types:"
+    
+    for entry in "${CONFIG_MAP[@]}"; do
+        key="${entry%%=*}"
+        log_info "  - $key"
+    done
+}
+
+# Update a specific configuration
+# Args:
+#   $1: The config type to update
+cmd_update() {
+    local config_type=$1
+    
+    # Check if --all flag is used
+    if [ "$config_type" = "--all" ]; then
+        _process_all_configs "cmd_update"
+        return 0
+    fi
+    
+    if [ -z "$config_type" ]; then
+        log_error "No config type specified"
+        cmd_help
+        return 1
+    fi
+    
+    local paths
+    
+    # Get paths for this config type
+    paths=$(_get_config_path "$config_type")
+    if [ $? -ne 0 ]; then
+        log_error "Unknown config type: $config_type"
+        return 1
+    fi
+    
+    # Get target and source from the paths
+    IFS=':' read -r target source <<< "$paths"
+    
+    log_info "Processing $config_type configuration..."
+    
+    # Create backup
+    _backup "$target" "$config_type"
+    
+    # Ensure parent directory exists
+    parent_dir=$(dirname "$target")
+    if [ ! -d "$parent_dir" ]; then
+        mkdir -p "$parent_dir"
+        log_info "Created directory: $parent_dir"
+    fi
+    
+    # Copy the configuration
+    if [ -d "$source" ]; then
+        # If source is a directory, use rsync if available for better handling
+        if command -v rsync &> /dev/null; then
+            rsync -avz --delete "$source/" "$target/" || log_error "Failed to update $config_type"
+        else
+            rm -rf "$target"
+            cp -r "$source" "$target" || log_error "Failed to update $config_type"
+        fi
+    else
+        cp "$source" "$target" || log_error "Failed to update $config_type"
+    fi
+    
+    log_success "$config_type configuration updated successfully!"
+}
+
+# Backup a specific configuration without updating
+# Args:
+#   $1: The config type to backup
+cmd_backup() {
+    local config_type=$1
+    
+    # Check if --all flag is used
+    if [ "$config_type" = "--all" ]; then
+        _process_all_configs "cmd_backup"
+        return 0
+    fi
+    
+    if [ -z "$config_type" ]; then
+        log_error "No config type specified"
+        cmd_help
+        return 1
+    fi
+    
+    local paths
+    
+    # Get paths for this config type
+    paths=$(_get_config_path "$config_type")
+    if [ $? -ne 0 ]; then
+        log_error "Unknown config type: $config_type"
+        return 1
+    fi
+    
+    # Get target from the paths
+    IFS=':' read -r target source <<< "$paths"
+    
+    log_info "Backing up $config_type configuration..."
+    
+    # Create backup
+    _backup "$target" "$config_type"
+    
+    log_success "$config_type configuration backed up successfully!"
+}
+
+
+# =======================================================================
+# MAIN
+# =======================================================================
+
+# Main function to route commands
+main() {
+    local cmd="$1"
+    shift
+    
+    case "$cmd" in
+        list)
+            cmd_list
+            ;;
+        update)
+            cmd_update "$@"
+            ;;
+        backup)
+            cmd_backup "$@"
+            ;;
+        help|--help|-h)
+            cmd_help
+            ;;
+        *)
+            log_error "Unknown command: $cmd"
+            cmd_help
+            exit 1
+            ;;
+    esac
+}
+
+# If no arguments, show help
+if [ $# -eq 0 ]; then
+    cmd_help
+    exit 1
+fi
+
+main "$@"
+exit 0

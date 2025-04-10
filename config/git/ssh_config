@@ -1,0 +1,10 @@
+Host github.com
+  User git
+  HostName github.com
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_rsa
+  IdentitiesOnly yes
+  PreferredAuthentications publickey
+  BatchMode no
+  ConnectTimeout 30

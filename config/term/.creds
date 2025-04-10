@@ -1,0 +1,68 @@
+#!/bin/bash
+#==================================================================================================
+#
+#                           ██████╗██████╗ ███████╗██████╗ ███████╗
+#                          ██╔════╝██╔══██╗██╔════╝██╔══██╗██╔════╝
+#                          ██║     ██████╔╝█████╗  ██║  ██║███████╗
+#                          ██║     ██╔══██╗██╔══╝  ██║  ██║╚════██║
+#                          ╚██████╗██║  ██║███████╗██████╔╝███████║
+#                           ╚═════╝╚═╝  ╚═╝╚══════╝╚═════╝ ╚══════╝
+#                                                                               
+#                       ✦ ✦ ✦   Maintained by Facundo Torraca   ✦ ✦ ✦
+#
+#                    🔒 Secure credential management for development 🔒
+#
+#==================================================================================================
+
+# IMPORTANT: Do not share this file with anyone. It contains sensitive information.
+# This file should be included in your .gitignore to prevent accidental commits.
+# All credentials are loaded from your keychain using the 'kc' command.
+
+# ==================================================================================================
+# =============================== KEYCHAIN CONFIGURATION ===========================================
+# ==================================================================================================
+
+# Set your custom keychain name
+export CUSTOM_KEYCHAIN_NAME="ftor.keychain"
+
+# Function to safely load credentials from keychain with error handling
+get_cred() {
+  local service="$1"
+  local account="$2"
+  local value
+
+  value=$(kc get "$service" "$account" 2>/dev/null)
+  local exit_code=$?
+  
+  if [ $exit_code -ne 0 ]; then
+    echo "⚠️  Warning: Failed to load credential for $service/$account" >&2
+    return 1
+  fi
+  
+  echo "$value"
+}
+
+# ==================================================================================================
+# =================================== DEVELOPMENT CREDENTIALS ======================================
+# ==================================================================================================
+
+# place all you credentials here
+
+# ==================================================================================================
+# ============================== CREDENTIAL VERIFICATION =========================================
+# ==================================================================================================
+
+# Verify essential credentials were loaded successfully
+verify_essential_creds() {
+  local missing=0
+  
+  # Add your critical credentials here
+  
+  if [ $missing -eq 0 ]; then
+    echo "  ✅ All essential credentials loaded successfully loaded from $CUSTOM_KEYCHAIN_NAME"
+  else
+    echo "  ⚠️  Warning: $missing essential credential(s) could not be loaded"
+  fi
+}
+
+verify_essential_creds

@@ -1,0 +1,55 @@
+##################################################################################################
+#                                           ALACRITT                                             #
+##################################################################################################
+[general]
+import = ["~/.config/alacritty/themes/themes/nordic.toml"]
+
+[window]
+blur          = true
+opacity       = 0.85
+startup_mode  = "Windowed"
+decorations   = "Buttonless"
+option_as_alt = "Both"
+dynamic_padding = true
+
+[window.padding]
+x = 10
+y = 10
+
+[scrolling]
+history    = 1000
+multiplier = 3
+
+[font]
+size = 12
+
+[font.normal]
+family = "MesloLGS Nerd Font Mono"
+style  = "Regular"
+
+[font.bold]
+family = "MesloLGS Nerd Font Mono"
+style  = "Bold"
+
+[font.italic]
+family = "MesloLGS Nerd Font Mono"
+style  = "Italic"
+
+[font.offset]
+x = 0
+y = 0
+
+[font.glyph_offset]
+x = 0
+y = 0
+
+[cursor]
+unfocused_hollow = true
+
+[cursor.style]
+shape = "Block"
+blinking = "Always"
+
+[bell]
+duration = 0
+animation = "EaseOutExpo"
