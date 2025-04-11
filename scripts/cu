@@ -28,7 +28,6 @@
 
 # Set backup directory
 BACKUP_DIR="$HOME/.dotfiles-backups"
-DOTFILES_DIR="$HOME/ftor/dotfiles"
 
 # Set dotfiles directory if not already set
 if [ -z "$DOTFILES_DIR" ]; then

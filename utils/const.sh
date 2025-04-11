@@ -126,14 +126,15 @@ DEFAULT_CUSTOM_KEYCHAIN_NAME="ftor.keychain"
 # PATHS
 #=======================================================================
 
-GIT_CONFIG_DIR="$HOME/ftor/dotfiles/config/git"
-TERM_CONFIG_DIR="$HOME/ftor/dotfiles/config/term"
+DOTFILES_DIR="$HOME/ftor/dotfiles"
+
+GIT_CONFIG_DIR="$DOTFILES_DIR/config/git"
+TERM_CONFIG_DIR="$DOTFILES_DIR/config/term"
 
 CREDS_SOURCE="$TERM_CONFIG_DIR/c"
 ZSH_RC_SOURCE="$TERM_CONFIG_DIR/.zshrc"
 GITIGNORE_SOURCE="$GIT_CONFIG_DIR/.gitignore_global"
 ALACRITTY_SOURCE_CONFIG="$TERM_CONFIG_DIR/.alacritty.toml"
-
 
 # Alacritty config paths
 ALACRITTY_CONFIG_DIR="$HOME/.config/alacritty"
