@@ -101,6 +101,7 @@ alias dcd="docker-compose down"
 # Ptyhon aliases
 alias pye="python -m venv .venv"
 alias pya="source .venv/bin/activate"
+alias pyd="deactivate"
 
 # Utilities
 alias myip="curl -s https://ifconfig.me && echo"
