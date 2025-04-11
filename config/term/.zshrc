@@ -100,7 +100,7 @@ alias dcd="docker-compose down"
 
 # Utilities
 alias myip="curl -s https://ifconfig.me && echo"
-alias dotfiles="code $HOME/documents/dotfiles"
+alias dotfiles="code $HOME/ftor/dotfiles"
 # ────────────────────────────────────────────────────────────────────────────────────────────────┘
 
 # ────────────────────────────────────────── scrips ──────────────────────────────────────────────┐

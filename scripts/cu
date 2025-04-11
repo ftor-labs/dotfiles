@@ -18,8 +18,8 @@
 # IMPORTS 
 # =======================================================================
 
-. $HOME/Documents/dotfiles/utils/log.sh
-. $HOME/Documents/dotfiles/utils/const.sh
+. $HOME/ftor/dotfiles/utils/log.sh
+. $HOME/ftor/dotfiles/utils/const.sh
 
 
 # =======================================================================
@@ -28,7 +28,7 @@
 
 # Set backup directory
 BACKUP_DIR="$HOME/.dotfiles-backups"
-DOTFILES_DIR="$HOME/Documents/dotfiles"
+DOTFILES_DIR="$HOME/ftor/dotfiles"
 
 # Set dotfiles directory if not already set
 if [ -z "$DOTFILES_DIR" ]; then

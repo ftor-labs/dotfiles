@@ -126,8 +126,8 @@ DEFAULT_CUSTOM_KEYCHAIN_NAME="ftor.keychain"
 # PATHS
 #=======================================================================
 
-GIT_CONFIG_DIR="$HOME/Documents/dotfiles/config/git"
-TERM_CONFIG_DIR="$HOME/Documents/dotfiles/config/term"
+GIT_CONFIG_DIR="$HOME/ftor/dotfiles/config/git"
+TERM_CONFIG_DIR="$HOME/ftor/dotfiles/config/term"
 
 CREDS_SOURCE="$TERM_CONFIG_DIR/c"
 ZSH_RC_SOURCE="$TERM_CONFIG_DIR/.zshrc"
