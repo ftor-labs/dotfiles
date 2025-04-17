@@ -131,7 +131,7 @@ DOTFILES_DIR="$HOME/ftor/dotfiles"
 GIT_CONFIG_DIR="$DOTFILES_DIR/config/git"
 TERM_CONFIG_DIR="$DOTFILES_DIR/config/term"
 
-CREDS_SOURCE="$TERM_CONFIG_DIR/c"
+CREDS_SOURCE="$TERM_CONFIG_DIR/.creds"
 ZSH_RC_SOURCE="$TERM_CONFIG_DIR/.zshrc"
 GITIGNORE_SOURCE="$GIT_CONFIG_DIR/.gitignore_global"
 ALACRITTY_SOURCE_CONFIG="$TERM_CONFIG_DIR/.alacritty.toml"
@@ -150,7 +150,7 @@ ZSH_CUSTOM_DIR="${ZSH_CUSTOM:-$ZSH_HOME/custom}"
 ZSH_PLUGINS_DIR="$ZSH_CUSTOM_DIR/plugins"
 ZSH_THEMES_DIR="$ZSH_CUSTOM_DIR/themes"
 P10K_THEME_DIR="$ZSH_THEMES_DIR/powerlevel10k"
-CREDS_ZSH_FILE="$HOME/c"
+CREDS_ZSH_FILE="$HOME/.creds"
 
 #=======================================================================
 # SHELL CONFIGURATION
